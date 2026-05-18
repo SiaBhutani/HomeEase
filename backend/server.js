@@ -20,14 +20,15 @@ const dbConfig = {
 
 let db;
 mysql
-  .createConnection(dbConfig)
-  .then((connection) => {
-    db = connection;
-    console.log("Connected to MySQL");
+  .createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT, // ← Important
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
   })
-  .catch((err) => {
-    console.error("MySQL connection error:", err);
-  });
+  .then(() => console.log("MySQL connected successfully"))
+  .catch((err) => console.error("MySQL connection error:", err));
 
 // SIGNUP
 app.post("/signup", async (req, res) => {
@@ -107,7 +108,7 @@ app.post("/api/bookings", async (req, res) => {
 
     const [[pro]] = await db.query(
       "SELECT id FROM users WHERE role = 'professional' AND service_id = ? LIMIT 1",
-      [service_id]
+      [service_id],
     );
     if (!pro) {
       return res
@@ -117,7 +118,7 @@ app.post("/api/bookings", async (req, res) => {
 
     const [[service]] = await db.query(
       "SELECT title FROM services WHERE id = ?",
-      [service_id]
+      [service_id],
     );
     if (!service) {
       return res.status(500).json({ error: "Service not found" });
@@ -126,7 +127,7 @@ app.post("/api/bookings", async (req, res) => {
     await db.query(
       `INSERT INTO bookings (user_id, professional_id, service_id, booking_date, booking_time, price, service_name) 
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [user.id, pro.id, service_id, date, time, price, service.title]
+      [user.id, pro.id, service_id, date, time, price, service.title],
     );
 
     res.status(200).json({
@@ -165,7 +166,7 @@ app.get("/api/user-bookings/:email", async (req, res) => {
       JOIN users u ON b.user_id = u.id
       WHERE u.email = ?
       ORDER BY b.booking_date DESC, b.booking_time DESC;`,
-      [email]
+      [email],
     );
 
     // Check if bookings are found
@@ -193,7 +194,7 @@ app.post("/api/submit-feedback", async (req, res) => {
   try {
     await db.query(
       "INSERT INTO feedback (booking_id, message, rating) VALUES (?, ?, ?)",
-      [booking_id, message, rating]
+      [booking_id, message, rating],
     );
     res.status(200).json({ message: "Feedback submitted successfully" });
   } catch (err) {
@@ -221,7 +222,7 @@ app.get("/api/requests/:service_id", async (req, res) => {
        JOIN users u ON b.user_id = u.id
        JOIN services s ON b.service_id = s.id
        WHERE b.service_id = ? AND b.status = 'pending'`,
-      [service_id]
+      [service_id],
     );
     res.status(200).json(results);
   } catch (err) {
@@ -252,7 +253,7 @@ app.post("/api/bookings/:id/reject", async (req, res) => {
     // Step 1: Find the booking
     const [bookingRows] = await db.query(
       "SELECT * FROM bookings WHERE id = ?",
-      [bookingId]
+      [bookingId],
     );
 
     if (bookingRows.length === 0) {
@@ -273,7 +274,7 @@ app.post("/api/bookings/:id/reject", async (req, res) => {
        AND service_id = ? 
        AND id != ? 
        LIMIT 1`,
-      [booking.service_id, professional_id]
+      [booking.service_id, professional_id],
     );
 
     if (otherPros.length > 0) {
@@ -282,14 +283,14 @@ app.post("/api/bookings/:id/reject", async (req, res) => {
       // Step 4: Update the professional_id in the bookings table
       await db.query(
         "UPDATE bookings SET professional_id = ?, status = 'pending' WHERE id = ?",
-        [newProfessionalId, bookingId]
+        [newProfessionalId, bookingId],
       );
 
       // Optional: Also log it in service_requests table if you're tracking reassignments
       await db.query(
         `INSERT INTO service_requests (booking_id, professional_id, status)
          VALUES (?, ?, 'pending')`,
-        [bookingId, newProfessionalId]
+        [bookingId, newProfessionalId],
       );
 
       return res.status(200).json({
@@ -317,7 +318,7 @@ app.post("/api/bookings/:id/accept", async (req, res) => {
     // Step 1: Find the original booking details
     const [bookingRows] = await db.query(
       "SELECT * FROM bookings WHERE id = ?",
-      [bookingId]
+      [bookingId],
     );
     const booking = bookingRows[0];
     if (!booking) return res.status(404).json({ message: "Booking not found" });
@@ -334,7 +335,7 @@ app.post("/api/bookings/:id/accept", async (req, res) => {
     // Step 3: Update booking status to "accepted" and assign the professional
     await db.query(
       "UPDATE bookings SET status = ?, professional_id = ? WHERE id = ?",
-      ["accepted", professional_id, bookingId]
+      ["accepted", professional_id, bookingId],
     );
 
     // Optional: Notify the customer and professional via email, socket, etc.
@@ -398,7 +399,7 @@ app.get("/api/professional/:professional_id/bookings", async (req, res) => {
       JOIN services s ON b.service_id = s.id
       LEFT JOIN feedback f ON b.id = f.booking_id  -- Join the feedback table
       WHERE b.professional_id = ? AND b.status IN ('accepted', 'done');`,
-      [professionalId]
+      [professionalId],
     );
     res.json(rows);
   } catch (err) {
@@ -451,7 +452,7 @@ app.put(
         `UPDATE bookings 
       SET status = 'done' 
       WHERE id = ? AND professional_id = ?`,
-        [booking_id, professional_id]
+        [booking_id, professional_id],
       );
 
       // If no rows were updated, send a 404
@@ -467,7 +468,7 @@ app.put(
       console.error("Error updating booking status:", err);
       res.status(500).json({ error: "Failed to update booking status" });
     }
-  }
+  },
 );
 
 app.listen(port, () => {

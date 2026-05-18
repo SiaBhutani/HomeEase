@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 
 const app = express();
-const port = 5001;
+const port = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -19,16 +19,22 @@ const dbConfig = {
 };
 
 let db;
+
 mysql
   .createConnection({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT, // ← Important
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   })
-  .then(() => console.log("MySQL connected successfully"))
-  .catch((err) => console.error("MySQL connection error:", err));
+  .then((connection) => {
+    db = connection; // IMPORTANT
+    console.log("MySQL connected successfully");
+  })
+  .catch((err) => {
+    console.error("MySQL connection error:", err);
+  });
 
 // SIGNUP
 app.post("/signup", async (req, res) => {

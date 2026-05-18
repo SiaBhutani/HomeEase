@@ -10,7 +10,7 @@ function Requests() {
   const fetchRequests = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/professionals/${professionalId}/requests`
+        `https://homeease-12co.onrender.com/api/professionals/${professionalId}/requests`,
       );
 
       if (!res.ok) {
@@ -28,7 +28,7 @@ function Requests() {
   const handleAccept = async (requestId) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/bookings/${requestId}/accept`,
+        `https://homeease-12co.onrender.com/api/bookings/${requestId}/accept`,
         {
           method: "POST",
           headers: {
@@ -37,7 +37,7 @@ function Requests() {
           body: JSON.stringify({
             professional_id: professionalId, // Send professional_id in the body
           }),
-        }
+        },
       );
       if (!res.ok) {
         throw new Error("Failed to accept request");
@@ -53,7 +53,7 @@ function Requests() {
   const handleReject = async (requestId) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/bookings/${requestId}/reject`,
+        `https://homeease-12co.onrender.com/api/bookings/${requestId}/reject`,
         {
           method: "POST",
           headers: {
@@ -62,7 +62,7 @@ function Requests() {
           body: JSON.stringify({
             professional_id: professionalId, // Send professional_id in the body (optional depending on your backend logic)
           }),
-        }
+        },
       );
       if (!res.ok) {
         throw new Error("Failed to reject request");

@@ -24,13 +24,16 @@ function Cart({ userEmail }) {
     }
 
     try {
-      const response = await axios.post("http://localhost:5001/api/bookings", {
-        email: userEmail,
-        service_id: service.id, // Ensure you are passing the correct service id
-        date,
-        time,
-        price: parseFloat(service.price.replace("Rs.", "")), // Ensure price is passed as a number
-      });
+      const response = await axios.post(
+        "https://homeease-12co.onrender.com/api/bookings",
+        {
+          email: userEmail,
+          service_id: service.id, // Ensure you are passing the correct service id
+          date,
+          time,
+          price: parseFloat(service.price.replace("Rs.", "")), // Ensure price is passed as a number
+        },
+      );
 
       setMessage(response.data.message);
     } catch (error) {

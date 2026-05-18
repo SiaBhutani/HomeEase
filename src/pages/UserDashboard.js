@@ -12,7 +12,7 @@ function UserDashboard() {
 
   const fetchBookings = () => {
     axios
-      .get(`http://localhost:5001/api/user-bookings/${userEmail}`)
+      .get(`https://homeease-12co.onrender.com/api/user-bookings/${userEmail}`)
       .then((res) => setBookings(res.data))
       .catch((err) => console.error("Failed to fetch bookings:", err));
   };
@@ -31,11 +31,14 @@ function UserDashboard() {
 
   const handleFeedbackSubmit = async () => {
     try {
-      await axios.post("http://localhost:5001/api/submit-feedback", {
-        booking_id: selectedBookingId,
-        message: feedback,
-        rating,
-      });
+      await axios.post(
+        "https://homeease-12co.onrender.com/api/submit-feedback",
+        {
+          booking_id: selectedBookingId,
+          message: feedback,
+          rating,
+        },
+      );
       alert("Feedback submitted!");
 
       // Reset modal state

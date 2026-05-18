@@ -12,7 +12,7 @@ const SignIn = ({ onLogin }) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5001/login", {
+      const res = await axios.post("https://homeease-12co.onrender.com/login", {
         email,
         password,
       });
@@ -35,7 +35,7 @@ const SignIn = ({ onLogin }) => {
         email,
         role,
         null,
-        role === "professional" ? userId : null
+        role === "professional" ? userId : null,
       );
 
       // Redirect

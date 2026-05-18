@@ -17,7 +17,7 @@ const SignUp = () => {
   useEffect(() => {
     // Fetch available services
     axios
-      .get("http://localhost:5001/api/services")
+      .get("https://homeease-12co.onrender.com/api/services")
       .then((res) => setServices(res.data))
       .catch((err) => console.error("Error fetching services", err));
   }, []);
@@ -26,7 +26,7 @@ const SignUp = () => {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5001/signup", {
+      await axios.post("https://homeease-12co.onrender.com/signup", {
         name,
         email,
         password,

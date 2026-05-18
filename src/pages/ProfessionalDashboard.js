@@ -10,7 +10,7 @@ const ProfessionalDashboard = () => {
     if (professionalId) {
       axios
         .get(
-          `http://localhost:5001/api/professional/${professionalId}/bookings`
+          `https://homeease-12co.onrender.com/api/professional/${professionalId}/bookings`,
         )
         .then((res) => setBookings(res.data))
         .catch((err) => console.error("Error fetching bookings:", err));
@@ -20,12 +20,12 @@ const ProfessionalDashboard = () => {
   const handleFinish = async (bookingId) => {
     try {
       await axios.put(
-        `http://localhost:5001/api/professional/${professionalId}/booking/${bookingId}/finish`
+        `http://localhost:5001/api/professional/${professionalId}/booking/${bookingId}/finish`,
       );
       setBookings((prev) =>
         prev.map((b) =>
-          b.bookingId === bookingId ? { ...b, status: "done" } : b
-        )
+          b.bookingId === bookingId ? { ...b, status: "done" } : b,
+        ),
       );
     } catch (err) {
       console.error("Error finishing the booking:", err);
